@@ -138,6 +138,7 @@ start_jumpserver() {
 
 config_autostart() {
 	echo -e "\033[31m 6. 配置自启 \033[0m"
+	systemctl enable nginx
 	if [ ! -f "/usr/lib/systemd/system/jms.service" ]
 	then
 	wget -O /usr/lib/systemd/system/jms.service https://demo.jumpserver.org/download/shell/1.4.8/centos/jms.service
