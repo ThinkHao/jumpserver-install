@@ -20,10 +20,10 @@ config_firewall() {
 	fi
 
 	sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/langpacks.conf
-	PACKAGEKIT=$(ps aux | grep PackageKit | awk '{print $2}')
+	PACKAGEKIT=$(ps aux | grep PackageKit | awk '{print $2}' | sed -n '1p')
 	if [ $PACKAGEKIT != "" ]
 	then
-	kill $PACKAGEKIT
+	kill -9 $PACKAGEKIT
 	fi
 }
 
