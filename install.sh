@@ -72,7 +72,7 @@ download_compoents() {
 	if [ ! -d "/opt/jumpserver" ]
 	then
 	tar xzvf $CurPWD/res/jumpserver.tar.gz -C /opt/
-	echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env
+	#echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env
 	fi
 	if [ ! -f "/opt/luna.tar.gz" ]
 	then
