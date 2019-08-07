@@ -9,7 +9,7 @@ cd jumpserver-install
 chmod a+x ./install.sh
 ./install.sh
 ```
-## 注意
+## 注意(问题已修复)
 如果脚本运行过程出现yum锁被占用的情况，多半是PackageKit占用导致，将其进程kill掉
 `kill $(ps aux | grep PackageKit | awk '{print $2}')`
 再次运行脚本即可
