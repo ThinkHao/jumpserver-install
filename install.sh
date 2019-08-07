@@ -151,6 +151,7 @@ config_autostart() {
 	then
 	wget -O /usr/lib/systemd/system/jms.service https://demo.jumpserver.org/download/shell/1.4.8/centos/jms.service
 	chmod 755 /usr/lib/systemd/system/jms.service
+	systemctl enable jms
 	fi
 	if [ ! -f "/opt/start_jms.sh" ]
 	then
