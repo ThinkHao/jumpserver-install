@@ -21,12 +21,20 @@ config_firewall() {
 	#setsebool -P httpd_can_network_connect 1
 	fi
 
-	sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/langpacks.conf
-	PACKAGEKIT=$(ps aux | grep PackageKit | awk '{print $2}' | sed -n '1p')
-	if [ $PACKAGEKIT != "" ]
-	then
-	kill -9 $PACKAGEKIT
-	fi
+	#sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/langpacks.conf
+	#PACKAGEKIT=$(ps aux | grep PackageKit | awk '{print $2}' | sed -n '1p')
+	#if [ $PACKAGEKIT != "" ]
+	#then
+	#kill -9 $PACKAGEKIT
+	#fi
+	
+	if ps aux | grep "yum" | grep -qv "grep"; then
+            if [ -s /usr/bin/killall ]; then
+                killall yum
+            else
+                kill `pidof yum`
+            fi
+    	fi
 }
 
 config_env() {
