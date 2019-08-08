@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 CurPWD=$(cd "$(dirname "$0")"; pwd)
-SOURCE_IP=`echo '192.168.0.0/16'`
+DOCKER_IP=`echo '172.17.0.0/16'`
 
 config_firewall() {
 	echo -e "\033[31m 1. 防火墙 Selinux PackageKit 设置 \033[0m"
@@ -10,7 +10,7 @@ config_firewall() {
 	then
 	firewall-cmd --zone=public --add-port=80/tcp --permanent
 	firewall-cmd --zone=public --add-port=2222/tcp --permanent
-	firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="$SOURCE_IP" port protocol="tcp" port="8080" accept"
+	firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="$DOCKER_IP" port protocol="tcp" port="8080" accept"
 	firewall-cmd --reload
 	fi
 
