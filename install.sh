@@ -16,7 +16,9 @@ config_firewall() {
 
 	if [ "$(getenforce)" != "Disabled" ]
 	then
-	setsebool -P httpd_can_network_connect 1
+	sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+	setenforce 0
+	#setsebool -P httpd_can_network_connect 1
 	fi
 
 	sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/langpacks.conf
