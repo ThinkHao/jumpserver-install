@@ -4,7 +4,7 @@ export PATH
 
 # Check if user is root
 if [ $(id -u) != "0" ]; then
-    echo "Error: You must be root to run this script, please use root to install lnmp"
+    echo "Error: You must be root to run this script！"
     exit 1
 fi
 
