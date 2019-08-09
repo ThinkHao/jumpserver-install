@@ -27,6 +27,15 @@ config_firewall() {
 	#then
 	#kill -9 $PACKAGEKIT
 	#fi
+}
+
+kill_PM() {
+	#sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/langpacks.conf
+	#PACKAGEKIT=$(ps aux | grep PackageKit | awk '{print $2}' | sed -n '1p')
+	#if [ $PACKAGEKIT != "" ]
+	#then
+	#kill -9 $PACKAGEKIT
+	#fi
 	
 	if ps aux | grep "yum" | grep -qv "grep"; then
             if [ -s /usr/bin/killall ]; then
@@ -35,6 +44,18 @@ config_firewall() {
                 kill `pidof yum`
             fi
     	fi
+}
+
+config_pip() {
+	mkdir -p ~/.pip
+	cat > ~/.pip/pip.conf << EOF
+[global]
+index-url = http://pypi.douban.com/simple
+[install]
+use-mirrors =true
+mirrors =http://pypi.douban.com/simple/
+trusted-host =pypi.douban.com
+EOF
 }
 
 config_env() {
@@ -185,6 +206,8 @@ action=$1
 case "${action}" in
     install)
 		config_firewall
+		kill_PM
+		config_pip
 		config_yum_online
 		config_env
 		download_compoents
@@ -197,3 +220,5 @@ case "${action}" in
         echo "Usage: $(basename $0) install"
         ;;
 esac
+
+exit
