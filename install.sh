@@ -102,7 +102,8 @@ download_compoents() {
 	cd /opt
 	if [ ! -d "/opt/jumpserver" ]
 	then
-	tar xzvf $CurPWD/res/jumpserver.tar.gz -C /opt/
+	tar xzvf $CurPWD/res/jumpserver$JUMP_VER.tar.gz -C /opt/
+	mv /opt/jumpserver$JUMP_VER /opt/jumpserver
 	#echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env
 	fi
 	if [ ! -f "/opt/luna.tar.gz" ]
@@ -202,7 +203,9 @@ config_autostart() {
 
 # Begin to install jumpserver
 action=$1
+JUMP_VER=$2
 [ -z $1 ] && action=install
+[ -z $2 ] && JUMP_VER=`echo '-1.4.10'`
 case "${action}" in
     install)
 		config_firewall
