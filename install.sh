@@ -128,7 +128,7 @@ download_compoents() {
 	fi
 	if [ ! -f "/opt/luna.tar.gz" ]
 	then
-	wget https://demo.jumpserver.org/download/luna/1.4.8/luna.tar.gz
+	wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz
 	tar xf luna.tar.gz
 	chown -R root:root luna
 	fi
