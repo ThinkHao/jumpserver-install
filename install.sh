@@ -8,6 +8,8 @@ if [ $(id -u) != "0" ]; then
     exit 1
 fi
 
+. include/main.sh
+
 CurPWD=$(cd "$(dirname "$0")"; pwd)
 DOCKER_IP=`echo '172.17.0.0/16'`
 
@@ -58,6 +60,17 @@ trusted-host =pypi.douban.com
 EOF
 }
 
+PIP_INSTALL() {
+	pip install $1 -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+	Echo_Green "$1 success to install"
+	else
+	Echo_Red "$1 fail to install"
+	exit 1
+	fi
+}
+
 config_env() {
 	echo -e "\033[31m 2. 部署环境 \033[0m"
 	ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -66,6 +79,7 @@ config_env() {
 	export LC_ALL=zh_CN.UTF-8
 	echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 	yum -y install wget gcc epel-release git
+	yum install https://centos7.iuscommunity.org/ius-release.rpm
 	yum install -y yum-utils device-mapper-persistent-data lvm2
 	yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 	yum makecache fast
@@ -74,9 +88,15 @@ config_env() {
 	rpm --import https://nginx.org/keys/nginx_signing.key
 	yum -y install redis mariadb mariadb-devel mariadb-server mariadb-shared nginx docker-ce
 	systemctl start redis mariadb
-	yum -y install python36 python36-devel
+	yum -y install python36u python36u-devel python36u-pip
 	cd /opt
+	if [ -s /usr/bin/python3.6 ]
+	then
 	python3.6 -m venv /opt/py3
+	else
+	Echo_Red "Python3.6 is not installed correctly, please install python3.6 manully"
+	exit 1
+	fi
 	source /opt/py3/bin/activate
 	cp $CurPWD/res/autoenv.tar.gz /opt/autoenv.tar.gz
 	cd /opt
@@ -114,11 +134,19 @@ download_compoents() {
 	fi
 	yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)
 	pip install --upgrade pip setuptools -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
-	pip install -r /opt/jumpserver/requirements/requirements.txt -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
+	#pip install -r /opt/jumpserver/requirements/requirements.txt -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
+	for module in `cat /opt/jumpserver/requirements/requirements.txt`
+	do
+	PIP_INSTALL $module
+	done
 	curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
 	systemctl restart docker
+	docker ps | grep jms
+	if [ $? -nq 0 ]
+	then
 	docker pull jumpserver/jms_coco:1.4.8
 	docker pull jumpserver/jms_guacamole:1.4.8
+	fi
 	rm -rf /etc/nginx/conf.d/default.conf
 	wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf
 	systemctl restart nginx
