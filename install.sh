@@ -123,13 +123,13 @@ download_compoents() {
 	cd /opt
 	if [ ! -d "/opt/jumpserver" ]
 	then
-	tar xzvf $CurPWD/res/jumpserver$JUMP_VER.tar.gz -C /opt/
+	tar xzvf $CurPWD/res/jumpserver-$JUMP_VER.tar.gz -C /opt/
 	mv /opt/jumpserver$JUMP_VER /opt/jumpserver
 	#echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env
 	fi
 	if [ ! -f "/opt/luna.tar.gz" ]
 	then
-	wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz
+	wget https://demo.jumpserver.org/download/luna/$JUMP_VER/luna.tar.gz
 	tar xf luna.tar.gz
 	chown -R root:root luna
 	fi
@@ -145,8 +145,8 @@ download_compoents() {
 	DOCKER_IS_RUNNING=`docker ps | grep jms`
 	if [ -z $DOCKER_IS_RUNNING ]
 	then
-	docker pull jumpserver/jms_coco:1.4.8
-	docker pull jumpserver/jms_guacamole:1.4.8
+	docker pull jumpserver/jms_koko:$JUMP_VER
+	docker pull jumpserver/jms_guacamole:$JUMP_VER
 	fi
 	rm -rf /etc/nginx/conf.d/default.conf
 	wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf
@@ -196,8 +196,8 @@ start_jumpserver() {
 	echo -e "\033[31m 5. 启动 Jumpserver \033[0m"
 	cd /opt/jumpserver
 	./jms start -d
-	docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.8
-	docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.8
+	docker run --name jms_koko -d -p 2222:2222 -p 127.0.0.1:5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN --restart=always jumpserver/jms_koko:1.5.2
+	docker run --name jms_guacamole -d -p 127.0.0.1:8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN --restart=always jumpserver/jms_guacamole:1.5.2
 	echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m"
 	echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m"
 	echo -e "\033[31m 你的BOOTSTRAP_TOKEN是 $BOOTSTRAP_TOKEN \033[0m"
@@ -210,17 +210,19 @@ config_autostart() {
 	systemctl enable nginx
 	if [ ! -f "/usr/lib/systemd/system/jms.service" ]
 	then
-	wget -O /usr/lib/systemd/system/jms.service https://demo.jumpserver.org/download/shell/1.4.8/centos/jms.service
+	wget -O /usr/lib/systemd/system/jms.service https://demo.jumpserver.org/download/shell/centos/jms.service
 	chmod 755 /usr/lib/systemd/system/jms.service
 	systemctl enable jms
 	fi
 	if [ ! -f "/opt/start_jms.sh" ]
 	then
-	wget -O /opt/start_jms.sh https://demo.jumpserver.org/download/shell/1.4.8/centos/start_jms.sh
+	wget -O /opt/start_jms.sh https://demo.jumpserver.org/download/shell/centos/start_jms.sh
+	chmod a+x /opt/start_jms.sh
 	fi
 	if [ ! -f "/opt/stop_jms.sh" ]
 	then
-	wget -O /opt/stop_jms.sh https://demo.jumpserver.org/download/shell/1.4.8/centos/stop_jms.sh
+	wget -O /opt/stop_jms.sh https://demo.jumpserver.org/download/shell/centos/stop_jms.sh
+	chmod a+x /opt/stop_jms.sh
 	fi
 	if [ "$(cat /etc/rc.local | grep start_jms.sh)" == "" ]
 	then
@@ -234,7 +236,7 @@ config_autostart() {
 action=$1
 JUMP_VER=$2
 [ -z $1 ] && action=install
-[ -z $2 ] && JUMP_VER=`echo '-1.4.10'`
+[ -z $2 ] && JUMP_VER=`echo '1.5.2'`
 case "${action}" in
     install)
 		config_firewall
