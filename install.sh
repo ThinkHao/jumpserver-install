@@ -142,8 +142,8 @@ download_compoents() {
 	done
 	curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
 	systemctl restart docker
-	docker ps | grep jms
-	if [ $? -nq 0 ]
+	DOCKER_IS_RUNNING=`docker ps | grep jms`
+	if [ -z $DOCKER_IS_RUNNING ]
 	then
 	docker pull jumpserver/jms_coco:1.4.8
 	docker pull jumpserver/jms_guacamole:1.4.8
