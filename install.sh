@@ -79,7 +79,8 @@ config_env() {
 	export LC_ALL=zh_CN.UTF-8
 	echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 	yum -y install wget gcc epel-release git
-	yum install -y https://centos7.iuscommunity.org/ius-release.rpm
+	#yum install -y https://centos7.iuscommunity.org/ius-release.rpm
+	yum install -y https://mirrors.tuna.tsinghua.edu.cn/ius/ius-release-el7.rpm
 	yum install -y yum-utils device-mapper-persistent-data lvm2
 	yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 	yum makecache fast
