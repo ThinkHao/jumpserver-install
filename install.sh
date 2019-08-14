@@ -229,8 +229,8 @@ config_autostart() {
 	echo "sh /opt/start_jms.sh" >> /etc/rc.local
 	chmod +x /etc/rc.d/rc.local
 	fi
-	/opt/stop_jms.sh
-	/opt/startjms.sh
+	bash /opt/stop_jms.sh
+	bash /opt/startjms.sh
 	echo -e "\033[31m 启动停止的脚本在 /opt 目录下, 如果自启失败可以手动启动 \033[0m"
 }
 
